@@ -1,0 +1,60 @@
+import { prisma } from '../config/prisma';
+import { createError } from '../utils/createError';
+
+/**
+ * Devuelve todas las zonas incluyendo el conteo de sensores
+ * activos (monitoreos en estado ACTIVO) en cada una.
+ */
+export const getAllZones = async () => {
+  const zones = await prisma.zone.findMany({
+    include: {
+      monitorings: {
+        where: { estado: 'ACTIVO' },
+        select: { id: true },
+      },
+    },
+  });
+
+  return zones.map(({ monitorings, ...zone }) => ({
+    ...zone,
+    sensoresActivos: monitorings.length,
+  }));
+};
+
+/** Devuelve una zona por id. Lanza 404 si no existe. */
+export const getZoneById = async (id: number) => {
+  const zone = await prisma.zone.findUnique({ where: { id } });
+
+  if (!zone) {
+    throw createError(`No existe una zona con id ${id}`, 404);
+  }
+
+  return zone;
+};
+
+/**
+ * Devuelve todos los sensores activos en una zona, junto con
+ * el tipoLectura y valorUmbral de su monitoreo.
+ * Lanza 404 si la zona no existe.
+ */
+export const getActiveSensorsByZone = async (id: number) => {
+  const zone = await prisma.zone.findUnique({
+    where: { id },
+    include: {
+      monitorings: {
+        where: { estado: 'ACTIVO' },
+        include: { sensor: true },
+      },
+    },
+  });
+
+  if (!zone) {
+    throw createError(`No existe una zona con id ${id}`, 404);
+  }
+
+  return zone.monitorings.map((monitoring) => ({
+    ...monitoring.sensor,
+    tipoLectura: monitoring.tipoLectura,
+    valorUmbral: monitoring.valorUmbral,
+  }));
+};

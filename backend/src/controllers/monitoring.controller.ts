@@ -1,0 +1,110 @@
+import { Request, Response, NextFunction } from 'express';
+import * as monitoringService from '../services/monitoring.service';
+import { createError } from '../utils/createError';
+import {
+  ApiResponse,
+  CreateMonitoringDto,
+  EstadoMonitoreo,
+} from '../types';
+
+export const getAllMonitorings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const status = req.query.status as string | undefined;
+
+    if (status && status !== 'ACTIVO' && status !== 'PAUSADO') {
+      throw createError(
+        `Estado inválido: ${status}. Los valores permitidos son ACTIVO o PAUSADO`,
+        400
+      );
+    }
+
+    const monitorings = await monitoringService.getAllMonitorings(
+      status as EstadoMonitoreo | undefined
+    );
+    const response: ApiResponse<typeof monitorings> = {
+      success: true,
+      data: monitorings,
+    };
+    res.json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createMonitoring = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { sensorId, zoneId, fechaInstalacion, tipoLectura, valorUmbral } =
+      req.body;
+
+    const missing: string[] = [];
+    if (sensorId === undefined || sensorId === null) missing.push('sensorId');
+    if (zoneId === undefined || zoneId === null) missing.push('zoneId');
+    if (fechaInstalacion === undefined || fechaInstalacion === null)
+      missing.push('fechaInstalacion');
+    if (tipoLectura === undefined || tipoLectura === null)
+      missing.push('tipoLectura');
+    if (valorUmbral === undefined || valorUmbral === null)
+      missing.push('valorUmbral');
+
+    if (missing.length > 0) {
+      throw createError(
+        `Faltan campos obligatorios: ${missing.join(', ')}`,
+        400
+      );
+    }
+
+    const monitoring = await monitoringService.createMonitoring(
+      req.body as CreateMonitoringDto
+    );
+    const response: ApiResponse<typeof monitoring> = {
+      success: true,
+      data: monitoring,
+      message: 'Monitoreo creado correctamente',
+    };
+    res.status(201).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateMonitoring = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      throw createError('El id del monitoreo debe ser un número válido', 400);
+    }
+
+    const { valorUmbral, estado } = req.body;
+    if (valorUmbral === undefined && estado === undefined) {
+      throw createError(
+        'Debes enviar al menos valorUmbral o estado para actualizar',
+        400
+      );
+    }
+
+    const monitoring = await monitoringService.updateMonitoring(id, {
+      valorUmbral,
+      estado,
+    });
+    const response: ApiResponse<typeof monitoring> = {
+      success: true,
+      data: monitoring,
+      message: 'Monitoreo actualizado correctamente',
+    };
+    res.json(response);
+  } catch (err) {
+    next(err);
+  }
+};
