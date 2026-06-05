@@ -74,6 +74,10 @@ export const createMonitoring = async (
       );
     }
 
+    if (estado !== 'ACTIVO' && estado !== 'PAUSADO') {
+      throw createError('El campo estado debe ser ACTIVO o PAUSADO', 400);
+    }
+
     const monitoring = await monitoringService.createMonitoring(
       req.body as CreateMonitoringDto
     );
