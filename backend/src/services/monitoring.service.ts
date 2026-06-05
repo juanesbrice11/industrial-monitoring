@@ -1,9 +1,11 @@
 import { prisma } from '../config/prisma';
 import { createError } from '../utils/createError';
+import { RANGOS_UMBRAL } from '../utils/umbral';
 import {
   CreateMonitoringDto,
   UpdateMonitoringDto,
   EstadoMonitoreo,
+  TipoLectura,
 } from '../types';
 
 /**
@@ -64,6 +66,26 @@ export const updateMonitoring = async (
   const monitoring = await prisma.monitoring.findUnique({ where: { id } });
   if (!monitoring) {
     throw createError(`No existe un monitoreo con id ${id}`, 404);
+  }
+
+  // Si se actualiza el valorUmbral, validar > 0 y el rango según el
+  // tipoLectura del monitoreo existente (el tipoLectura no se actualiza aquí).
+  if (data.valorUmbral !== undefined) {
+    if (typeof data.valorUmbral !== 'number' || data.valorUmbral <= 0) {
+      throw createError(
+        'El campo valorUmbral debe ser un número mayor a 0',
+        400
+      );
+    }
+
+    const tipoLectura = monitoring.tipoLectura as TipoLectura;
+    const { min, max } = RANGOS_UMBRAL[tipoLectura];
+    if (data.valorUmbral < min || data.valorUmbral > max) {
+      throw createError(
+        `El valorUmbral para ${tipoLectura} debe estar entre ${min} y ${max}`,
+        400
+      );
+    }
   }
 
   const updateData: UpdateMonitoringDto = {};

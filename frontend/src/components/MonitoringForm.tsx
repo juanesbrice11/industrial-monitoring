@@ -19,6 +19,17 @@ const TIPOS_LECTURA: TipoLectura[] = [
 ];
 const ESTADOS: EstadoMonitoreo[] = ['ACTIVO', 'PAUSADO'];
 
+// Rango válido de valorUmbral según el tipo de lectura
+const RANGOS_UMBRAL: Record<
+  TipoLectura,
+  { min: number; max: number; unidad: string; ejemplo: string }
+> = {
+  TEMPERATURA: { min: 1, max: 500, unidad: '°C', ejemplo: '85.0' },
+  PRESION: { min: 1, max: 1000, unidad: 'PSI', ejemplo: '120.0' },
+  VIBRACION: { min: 1, max: 200, unidad: 'Hz', ejemplo: '50.0' },
+  FLUJO: { min: 1, max: 1000, unidad: 'L/min', ejemplo: '200.0' },
+};
+
 const inputClass =
   'w-full rounded-lg border border-[#E2E8F0] px-3 py-2 text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-blue-500';
 const labelClass = 'mb-1 block font-medium text-[#0F172A]';
@@ -41,6 +52,7 @@ function MonitoringForm({ onSuccess }: MonitoringFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [umbralError, setUmbralError] = useState('');
 
   useEffect(() => {
     getSensors()
@@ -55,9 +67,24 @@ function MonitoringForm({ onSuccess }: MonitoringFormProps) {
     e.preventDefault();
     setSuccess('');
     setError('');
+    setUmbralError('');
 
     if (!sensorId || !zoneId || !valorUmbral || !fechaInstalacion) {
       setError('Por favor completa todos los campos');
+      return;
+    }
+
+    // Validación cliente del valorUmbral (no envía la petición si falla)
+    const umbralNum = Number(valorUmbral);
+    const rango = RANGOS_UMBRAL[tipoLectura];
+    if (Number.isNaN(umbralNum) || umbralNum <= 0) {
+      setUmbralError('El valor umbral debe ser un número mayor a 0');
+      return;
+    }
+    if (umbralNum < rango.min || umbralNum > rango.max) {
+      setUmbralError(
+        `El valor umbral para ${tipoLectura} debe estar entre ${rango.min} y ${rango.max} ${rango.unidad}`
+      );
       return;
     }
 
@@ -157,12 +184,16 @@ function MonitoringForm({ onSuccess }: MonitoringFormProps) {
           <input
             id="valorUmbral"
             type="number"
-            step="any"
+            min="1"
+            step="0.1"
             className={inputClass}
             value={valorUmbral}
             onChange={(e) => setValorUmbral(e.target.value)}
-            placeholder="Ej: 85"
+            placeholder={`Ej: ${RANGOS_UMBRAL[tipoLectura].ejemplo} (${RANGOS_UMBRAL[tipoLectura].min}-${RANGOS_UMBRAL[tipoLectura].max} ${RANGOS_UMBRAL[tipoLectura].unidad})`}
           />
+          {umbralError && (
+            <p className="mt-1 text-sm text-red-500">{umbralError}</p>
+          )}
         </div>
 
         <div>

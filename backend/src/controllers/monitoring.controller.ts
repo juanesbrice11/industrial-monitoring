@@ -5,7 +5,9 @@ import {
   ApiResponse,
   CreateMonitoringDto,
   EstadoMonitoreo,
+  TipoLectura,
 } from '../types';
+import { TIPOS_LECTURA, RANGOS_UMBRAL } from '../utils/umbral';
 
 export const getAllMonitorings = async (
   req: Request,
@@ -83,6 +85,25 @@ export const createMonitoring = async (
 
     if (estado !== 'ACTIVO' && estado !== 'PAUSADO') {
       throw createError('El campo estado debe ser ACTIVO o PAUSADO', 400);
+    }
+
+    if (!TIPOS_LECTURA.includes(tipoLectura)) {
+      throw createError(
+        'El campo tipoLectura debe ser TEMPERATURA, PRESION, VIBRACION o FLUJO',
+        400
+      );
+    }
+
+    if (typeof valorUmbral !== 'number' || valorUmbral <= 0) {
+      throw createError('El campo valorUmbral debe ser un número mayor a 0', 400);
+    }
+
+    const { min, max } = RANGOS_UMBRAL[tipoLectura as TipoLectura];
+    if (valorUmbral < min || valorUmbral > max) {
+      throw createError(
+        `El valorUmbral para ${tipoLectura} debe estar entre ${min} y ${max}`,
+        400
+      );
     }
 
     const monitoring = await monitoringService.createMonitoring(
