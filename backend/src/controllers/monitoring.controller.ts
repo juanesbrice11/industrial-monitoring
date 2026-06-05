@@ -67,6 +67,13 @@ export const createMonitoring = async (
       );
     }
 
+    if (isNaN(new Date(fechaInstalacion).getTime())) {
+      throw createError(
+        'El campo fechaInstalacion debe ser una fecha válida (YYYY-MM-DD)',
+        400
+      );
+    }
+
     if (estado === undefined || estado === null) {
       throw createError(
         'El campo estado es obligatorio (ACTIVO o PAUSADO)',
