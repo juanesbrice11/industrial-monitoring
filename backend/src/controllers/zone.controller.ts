@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as zoneService from '../services/zone.service';
 import { createError } from '../utils/createError';
-import { ApiResponse } from '../types';
+import { ApiResponse, Zone } from '../types';
 
 export const getAllZones = async (
   _req: Request,
@@ -11,6 +11,25 @@ export const getAllZones = async (
   try {
     const zones = await zoneService.getAllZones();
     const response: ApiResponse<typeof zones> = { success: true, data: zones };
+    res.json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getZoneById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      throw createError('El id de la zona debe ser un número válido', 400);
+    }
+
+    const zone = await zoneService.getZoneById(id);
+    const response: ApiResponse<Zone> = { success: true, data: zone };
     res.json(response);
   } catch (err) {
     next(err);
