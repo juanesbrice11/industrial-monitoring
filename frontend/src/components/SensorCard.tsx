@@ -12,7 +12,8 @@ const estadoStyles: Record<EstadoMonitoreo, string> = {
 
 function SensorCard({ sensor }: SensorCardProps) {
   const umbralElevado = sensor.valorUmbral > 80;
-  const estado: EstadoMonitoreo = sensor.estado ?? 'ACTIVO';
+  // Badge según el estado del MONITOREO (ACTIVO/PAUSADO), no el de la zona
+  const estado = sensor.estado;
 
   return (
     <div

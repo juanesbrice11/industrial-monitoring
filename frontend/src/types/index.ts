@@ -30,7 +30,7 @@ export interface Zone {
 export interface ActiveSensor extends Sensor {
   tipoLectura: TipoLectura;
   valorUmbral: number;
-  estado?: EstadoMonitoreo;
+  estado: EstadoMonitoreo;
 }
 
 export interface Monitoring {
