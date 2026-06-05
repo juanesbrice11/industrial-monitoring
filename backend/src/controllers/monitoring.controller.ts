@@ -41,8 +41,14 @@ export const createMonitoring = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { sensorId, zoneId, fechaInstalacion, tipoLectura, valorUmbral } =
-      req.body;
+    const {
+      sensorId,
+      zoneId,
+      fechaInstalacion,
+      tipoLectura,
+      valorUmbral,
+      estado,
+    } = req.body;
 
     const missing: string[] = [];
     if (sensorId === undefined || sensorId === null) missing.push('sensorId');
@@ -57,6 +63,13 @@ export const createMonitoring = async (
     if (missing.length > 0) {
       throw createError(
         `Faltan campos obligatorios: ${missing.join(', ')}`,
+        400
+      );
+    }
+
+    if (estado === undefined || estado === null) {
+      throw createError(
+        'El campo estado es obligatorio (ACTIVO o PAUSADO)',
         400
       );
     }
