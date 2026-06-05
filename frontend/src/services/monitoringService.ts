@@ -15,6 +15,12 @@ export const getSensors = async (): Promise<ApiResponse<Sensor[]>> => {
   return data;
 };
 
+/** GET /zones */
+export const getZones = async (): Promise<ApiResponse<Zone[]>> => {
+  const { data } = await api.get<ApiResponse<Zone[]>>('/zones');
+  return data;
+};
+
 /** GET /sensors/:id/zones */
 export const getSensorZones = async (
   id: number
