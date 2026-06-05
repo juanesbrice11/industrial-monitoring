@@ -45,7 +45,12 @@ export const createMonitoring = async (data: CreateMonitoringDto) => {
     );
   }
 
-  return prisma.monitoring.create({ data });
+  return prisma.monitoring.create({
+    data: {
+      ...data,
+      fechaInstalacion: new Date(data.fechaInstalacion),
+    },
+  });
 };
 
 /**

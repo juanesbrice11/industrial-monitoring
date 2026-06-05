@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { notFound } from './middlewares/notFound';
 import { errorHandler } from './middlewares/errorHandler';
+import { setupRoutes } from './routes/index.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// ROUTES - se agregarán en el siguiente paso
+setupRoutes(app);
 
 // Manejo de rutas no encontradas
 app.use(notFound);
