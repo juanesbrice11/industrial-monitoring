@@ -33,16 +33,15 @@ export const getZoneById = async (id: number) => {
 };
 
 /**
- * Devuelve todos los sensores activos en una zona, junto con
- * el tipoLectura y valorUmbral de su monitoreo.
+ * Devuelve todos los sensores de una zona (activos y pausados),
+ * junto con el tipoLectura, valorUmbral y estado de su monitoreo.
  * Lanza 404 si la zona no existe.
  */
-export const getActiveSensorsByZone = async (id: number) => {
+export const getSensorsByZone = async (id: number) => {
   const zone = await prisma.zone.findUnique({
     where: { id },
     include: {
       monitorings: {
-        where: { estado: 'ACTIVO' },
         include: { sensor: true },
       },
     },
@@ -56,5 +55,6 @@ export const getActiveSensorsByZone = async (id: number) => {
     ...monitoring.sensor,
     tipoLectura: monitoring.tipoLectura,
     valorUmbral: monitoring.valorUmbral,
+    estado: monitoring.estado,
   }));
 };

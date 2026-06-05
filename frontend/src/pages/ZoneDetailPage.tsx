@@ -80,7 +80,8 @@ function ZoneDetailPage() {
           </div>
 
           <h2 className="mb-4 text-lg font-semibold text-[#0F172A]">
-            Sensores activos ({sensors.length})
+            Sensores activos (
+            {sensors.filter((s) => s.estado === 'ACTIVO').length})
           </h2>
 
           {sensors.length === 0 ? (

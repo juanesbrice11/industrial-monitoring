@@ -36,7 +36,7 @@ export const getZoneById = async (
   }
 };
 
-export const getActiveSensorsByZone = async (
+export const getSensorsByZone = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -47,7 +47,7 @@ export const getActiveSensorsByZone = async (
       throw createError('El id de la zona debe ser un número válido', 400);
     }
 
-    const sensors = await zoneService.getActiveSensorsByZone(id);
+    const sensors = await zoneService.getSensorsByZone(id);
     const response: ApiResponse<typeof sensors> = {
       success: true,
       data: sensors,
