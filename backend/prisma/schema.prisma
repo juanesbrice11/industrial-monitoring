@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoSensor {
+  TEMPERATURA
+  PRESION
+  VIBRACION
+  FLUJO
+}
+
+enum EstadoOperativo {
+  ACTIVA
+  INACTIVA
+  MANTENIMIENTO
+}
+
+enum EstadoMonitoreo {
+  ACTIVO
+  PAUSADO
+}
+
+model Sensor {
+  id               Int          @id @default(autoincrement())
+  nombre           String
+  tipo             TipoSensor
+  fabricante       String
+  fechaFabricacion DateTime
+  createdAt        DateTime     @default(now())
+
+  monitorings Monitoring[]
+}
+
+model Zone {
+  id              Int             @id @default(autoincrement())
+  nombre          String
+  descripcion     String
+  ubicacion       String
+  estadoOperativo EstadoOperativo
+  createdAt       DateTime        @default(now())
+
+  monitorings Monitoring[]
+}
+
+model Monitoring {
+  id               Int             @id @default(autoincrement())
+  sensorId         Int
+  zoneId           Int
+  fechaInstalacion DateTime
+  tipoLectura      TipoSensor
+  valorUmbral      Float
+  estado           EstadoMonitoreo
+  createdAt        DateTime        @default(now())
+
+  sensor Sensor @relation(fields: [sensorId], references: [id])
+  zone   Zone   @relation(fields: [zoneId], references: [id])
+
+  @@unique([sensorId, zoneId])
+}
