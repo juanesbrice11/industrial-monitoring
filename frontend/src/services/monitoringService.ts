@@ -4,6 +4,7 @@ import {
   Sensor,
   Zone,
   Monitoring,
+  ActiveSensor,
   CreateMonitoringDto,
   UpdateMonitoringDto,
   EstadoMonitoreo,
@@ -32,8 +33,10 @@ export const getSensorZones = async (
 /** GET /zones/:id/sensors */
 export const getZonesSensors = async (
   id: number
-): Promise<ApiResponse<Sensor[]>> => {
-  const { data } = await api.get<ApiResponse<Sensor[]>>(`/zones/${id}/sensors`);
+): Promise<ApiResponse<ActiveSensor[]>> => {
+  const { data } = await api.get<ApiResponse<ActiveSensor[]>>(
+    `/zones/${id}/sensors`
+  );
   return data;
 };
 

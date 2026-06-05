@@ -19,6 +19,18 @@ export interface Zone {
   ubicacion: string;
   estadoOperativo: EstadoOperativo;
   createdAt: string;
+  // GET /zones añade el conteo de sensores activos por zona
+  sensoresActivos?: number;
+}
+
+/**
+ * Objeto que devuelve GET /zones/:id/sensors:
+ * los datos del sensor + el tipoLectura y valorUmbral de su monitoreo.
+ */
+export interface ActiveSensor extends Sensor {
+  tipoLectura: TipoLectura;
+  valorUmbral: number;
+  estado?: EstadoMonitoreo;
 }
 
 export interface Monitoring {
