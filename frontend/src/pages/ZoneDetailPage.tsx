@@ -37,6 +37,11 @@ function ZoneDetailPage() {
       .finally(() => setLoading(false));
   }, [zoneId]);
 
+  const sensoresActivos = sensors.filter((s) => s.estado === 'ACTIVO');
+  const sensoresPausados = sensors.filter((s) => s.estado === 'PAUSADO');
+  // Grid: primero los ACTIVO, luego los PAUSADO
+  const sensoresOrdenados = [...sensoresActivos, ...sensoresPausados];
+
   return (
     <div>
       <button
@@ -79,18 +84,22 @@ function ZoneDetailPage() {
             <p className="mt-1 text-[#64748B]">{zone.descripcion}</p>
           </div>
 
-          <h2 className="mb-4 text-lg font-semibold text-[#0F172A]">
-            Sensores activos (
-            {sensors.filter((s) => s.estado === 'ACTIVO').length})
-          </h2>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center rounded-full bg-[#DCFCE7] px-3 py-1 text-sm font-medium text-[#10B981]">
+              Sensores activos: {sensoresActivos.length}
+            </span>
+            <span className="inline-flex items-center rounded-full bg-[#F1F5F9] px-3 py-1 text-sm font-medium text-[#94A3B8]">
+              Sensores pausados: {sensoresPausados.length}
+            </span>
+          </div>
 
           {sensors.length === 0 ? (
             <p className="rounded-xl border border-[#E2E8F0] bg-white p-6 text-center text-[#64748B] shadow-sm">
-              No hay sensores activos en esta zona
+              No hay sensores en esta zona
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {sensors.map((sensor) => (
+              {sensoresOrdenados.map((sensor) => (
                 <SensorCard key={sensor.id} sensor={sensor} />
               ))}
             </div>

@@ -19,7 +19,7 @@ function SensorCard({ sensor }: SensorCardProps) {
     <div
       className={`rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-sm ${
         umbralElevado ? 'border-l-4 border-l-red-500' : ''
-      }`}
+      } ${estado === 'PAUSADO' ? 'opacity-75' : ''}`}
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold text-[#0F172A]">{sensor.nombre}</h3>
