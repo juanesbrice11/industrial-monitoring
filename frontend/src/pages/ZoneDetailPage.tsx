@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { getZones, getZonesSensors } from '../services/monitoringService';
+import { getZoneById, getZonesSensors } from '../services/monitoringService';
 import { Zone, ActiveSensor, EstadoOperativo } from '../types';
 import SensorCard from '../components/SensorCard';
 
@@ -28,10 +28,9 @@ function ZoneDetailPage() {
       return;
     }
 
-    Promise.all([getZones(), getZonesSensors(zoneId)])
-      .then(([zonesRes, sensorsRes]) => {
-        const found = (zonesRes.data ?? []).find((z) => z.id === zoneId) ?? null;
-        setZone(found);
+    Promise.all([getZoneById(zoneId), getZonesSensors(zoneId)])
+      .then(([zoneRes, sensorsRes]) => {
+        setZone(zoneRes.data ?? null);
         setSensors(sensorsRes.data ?? []);
       })
       .catch(() => setError('No se pudo cargar la zona'))

@@ -30,6 +30,14 @@ export const getSensorZones = async (
   return data;
 };
 
+/** GET /zones/:id */
+export const getZoneById = async (
+  id: number
+): Promise<ApiResponse<Zone>> => {
+  const { data } = await api.get<ApiResponse<Zone>>(`/zones/${id}`);
+  return data;
+};
+
 /** GET /zones/:id/sensors */
 export const getZonesSensors = async (
   id: number
