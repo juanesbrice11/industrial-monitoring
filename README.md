@@ -59,7 +59,7 @@ mysql -u root -p < schema.sql
 
 Te pedirá la contraseña de tu MySQL. Esto crea la base de datos llamada **`industrial_monitoring`** con sus 3 tablas (`sensor`, `zone`, `monitoring`) y los datos de ejemplo.
 
-> 💡 Para verificar que se cargó bien:
+> Para verificar que se cargó bien:
 > ```bash
 > mysql -u root -p -e "USE industrial_monitoring; SELECT COUNT(*) FROM sensor;"
 > ```
@@ -123,7 +123,7 @@ VITE_API_URL=http://localhost:3000
 npm run dev
 ```
 
-Abre el navegador en **http://localhost:5173** 🎉
+Abre el navegador en **http://localhost:5173**
 
 ---
 
@@ -159,7 +159,7 @@ Abre el navegador en **http://localhost:5173** 🎉
 
 ---
 
-## 🌐 API — Endpoints
+## API — Endpoints
 
 Base URL: `http://localhost:3000`
 
@@ -198,7 +198,7 @@ curl -X POST http://localhost:3000/monitorings \
 
 ---
 
-## 🛠️ Solución de problemas
+## Solución de problemas
 
 | Problema | Causa probable / solución |
 |----------|---------------------------|
