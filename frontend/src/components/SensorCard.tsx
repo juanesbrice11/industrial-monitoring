@@ -40,7 +40,9 @@ function SensorCard({ sensor, onUpdate }: SensorCardProps) {
   }, [sensor.id, sensor.tipoLectura]);
 
   const { unidad } = RANGOS_LECTURA[sensor.tipoLectura];
-  const superaUmbral = lecturaActual > sensor.valorUmbral;
+  // Solo se alarma si el monitoreo está ACTIVO (un PAUSADO no monitorea)
+  const superaUmbral =
+    estado === 'ACTIVO' && lecturaActual > sensor.valorUmbral;
 
   // Estado del panel de edición
   const [open, setOpen] = useState(false);
@@ -67,8 +69,8 @@ function SensorCard({ sensor, onUpdate }: SensorCardProps) {
         estado: nuevoEstado,
       });
       if (res.success) {
-        setPanelMensaje('Monitoreo actualizado');
         onUpdate?.();
+        setOpen(false);
       } else {
         setPanelError(res.error ?? 'No se pudo actualizar el monitoreo');
       }
@@ -95,8 +97,8 @@ function SensorCard({ sensor, onUpdate }: SensorCardProps) {
         valorUmbral: Number(umbralInput),
       });
       if (res.success) {
-        setPanelMensaje('Monitoreo actualizado');
         onUpdate?.();
+        setOpen(false);
       } else {
         setPanelError(res.error ?? 'No se pudo actualizar el monitoreo');
       }
@@ -145,7 +147,11 @@ function SensorCard({ sensor, onUpdate }: SensorCardProps) {
         <div className="mt-4 space-y-1">
           <p
             className={`text-sm font-semibold ${
-              superaUmbral ? 'text-[#EF4444]' : 'text-[#10B981]'
+              superaUmbral
+                ? 'text-[#EF4444]'
+                : estado === 'PAUSADO'
+                  ? 'text-[#64748B]'
+                  : 'text-[#10B981]'
             }`}
           >
             Lectura actual: {lecturaActual} {unidad}
@@ -155,7 +161,11 @@ function SensorCard({ sensor, onUpdate }: SensorCardProps) {
           </p>
         </div>
 
-        {superaUmbral ? (
+        {estado === 'PAUSADO' ? (
+          <p className="mt-3 text-xs font-medium text-[#94A3B8]">
+            Monitoreo en pausa
+          </p>
+        ) : superaUmbral ? (
           <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[#EF4444]">
             <AlertTriangle className="h-4 w-4" />⚠ Valor por encima del umbral
           </p>
@@ -222,7 +232,7 @@ function SensorCard({ sensor, onUpdate }: SensorCardProps) {
                   step="0.1"
                   value={umbralInput}
                   onChange={(e) => setUmbralInput(e.target.value)}
-                  placeholder={`${rango.min}-${rango.max}`}
+                  placeholder={`Ej: ${rango.ejemplo} (${rango.min}-${rango.max} ${rango.unidad})`}
                   className="w-full rounded-lg border border-[#E2E8F0] px-3 py-2 text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
