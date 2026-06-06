@@ -139,6 +139,10 @@ export const updateMonitoring = async (
       );
     }
 
+    if (estado !== undefined && estado !== 'ACTIVO' && estado !== 'PAUSADO') {
+      throw createError('El campo estado debe ser ACTIVO o PAUSADO', 400);
+    }
+
     const monitoring = await monitoringService.updateMonitoring(id, {
       valorUmbral,
       estado,

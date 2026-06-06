@@ -53,6 +53,7 @@ export const getSensorsByZone = async (id: number) => {
 
   return zone.monitorings.map((monitoring) => ({
     ...monitoring.sensor,
+    monitoringId: monitoring.id,
     tipoLectura: monitoring.tipoLectura,
     valorUmbral: monitoring.valorUmbral,
     estado: monitoring.estado,

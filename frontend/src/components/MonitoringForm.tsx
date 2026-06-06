@@ -10,6 +10,7 @@ import {
   TipoLectura,
   EstadoMonitoreo,
 } from '../types';
+import { RANGOS_UMBRAL, validarUmbral } from '../utils/umbral';
 
 const TIPOS_LECTURA: TipoLectura[] = [
   'TEMPERATURA',
@@ -18,17 +19,6 @@ const TIPOS_LECTURA: TipoLectura[] = [
   'FLUJO',
 ];
 const ESTADOS: EstadoMonitoreo[] = ['ACTIVO', 'PAUSADO'];
-
-// Rango válido de valorUmbral según el tipo de lectura
-const RANGOS_UMBRAL: Record<
-  TipoLectura,
-  { min: number; max: number; unidad: string; ejemplo: string }
-> = {
-  TEMPERATURA: { min: 1, max: 500, unidad: '°C', ejemplo: '85.0' },
-  PRESION: { min: 1, max: 1000, unidad: 'PSI', ejemplo: '120.0' },
-  VIBRACION: { min: 1, max: 200, unidad: 'Hz', ejemplo: '50.0' },
-  FLUJO: { min: 1, max: 1000, unidad: 'L/min', ejemplo: '200.0' },
-};
 
 const inputClass =
   'w-full rounded-lg border border-[#E2E8F0] px-3 py-2 text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-blue-500';
@@ -75,16 +65,9 @@ function MonitoringForm({ onSuccess }: MonitoringFormProps) {
     }
 
     // Validación cliente del valorUmbral (no envía la petición si falla)
-    const umbralNum = Number(valorUmbral);
-    const rango = RANGOS_UMBRAL[tipoLectura];
-    if (Number.isNaN(umbralNum) || umbralNum <= 0) {
-      setUmbralError('El valor umbral debe ser un número mayor a 0');
-      return;
-    }
-    if (umbralNum < rango.min || umbralNum > rango.max) {
-      setUmbralError(
-        `El valor umbral para ${tipoLectura} debe estar entre ${rango.min} y ${rango.max} ${rango.unidad}`
-      );
+    const errorUmbral = validarUmbral(Number(valorUmbral), tipoLectura);
+    if (errorUmbral) {
+      setUmbralError(errorUmbral);
       return;
     }
 

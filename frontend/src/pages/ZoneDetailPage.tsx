@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getZoneById, getZonesSensors } from '../services/monitoringService';
@@ -21,7 +21,7 @@ function ZoneDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     if (Number.isNaN(zoneId)) {
       setError('Zona inválida');
       setLoading(false);
@@ -36,6 +36,10 @@ function ZoneDetailPage() {
       .catch(() => setError('No se pudo cargar la zona'))
       .finally(() => setLoading(false));
   }, [zoneId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const sensoresActivos = sensors.filter((s) => s.estado === 'ACTIVO');
   const sensoresPausados = sensors.filter((s) => s.estado === 'PAUSADO');
@@ -100,7 +104,11 @@ function ZoneDetailPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {sensoresOrdenados.map((sensor) => (
-                <SensorCard key={sensor.id} sensor={sensor} />
+                <SensorCard
+                  key={sensor.monitoringId}
+                  sensor={sensor}
+                  onUpdate={fetchData}
+                />
               ))}
             </div>
           )}

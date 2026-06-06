@@ -28,6 +28,7 @@ export interface Zone {
  * los datos del sensor + el tipoLectura y valorUmbral de su monitoreo.
  */
 export interface ActiveSensor extends Sensor {
+  monitoringId: number;
   tipoLectura: TipoLectura;
   valorUmbral: number;
   estado: EstadoMonitoreo;
